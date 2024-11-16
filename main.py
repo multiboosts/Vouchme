@@ -90,7 +90,7 @@ async def backupvouches(ctx):
     await ctx.defer()
     channeltosend = await bot.fetch_channel(int(config['backup_command_channel']))    
     if not os.listdir('vouches'):
-        await ctx.response.send_message("No vouches to backup!", ephemeral=True)
+        await ctx.respond("No vouches to backup!", ephemeral=True)
         return
     
     for filename in os.listdir('vouches'):
@@ -116,7 +116,7 @@ async def backupvouches(ctx):
                     embed.set_image(url=vouch['attachment'])
                 
                 await channeltosend.send(embed=embed)
-                await ctx.response_send_message("backed up vouches successfully", ephemeral=True)
+                await ctx.respond("backed up vouches successfully", ephemeral=True)
                 print(f"Backed up vouch! number: {filename}")
         except json.JSONDecodeError:
             print(f"Skipping invalid JSON file: {filename}")
