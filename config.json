@@ -4,8 +4,9 @@
     "admin_role": "",
     "vouch_command_channel": "",
     "backup_command_channel": "",
-    "status": ".gg/multiboosts #1 provider",
-    "hex_embed_color": "01e8ff",
-    "support_server": "https://discord.gg/bnJJRVZn4N",
-    "footer_text": "thank you for leaving a vouch"
+    "status": ".gg/elitebotting | .gg/multiboosts",
+    "hex_embed_color": "1c2fbc",
+    "support_server": "https://discord.gg/multiboosts",
+    "footer_text": "thank you for leaving a vouch",
+    "emoji_id": "1314235786261954580"
 }
