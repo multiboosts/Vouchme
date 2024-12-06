@@ -6,6 +6,7 @@ from pystyle import Center
 import os
 import json
 import ctypes
+import asyncio
 config = json.load(open("config.json", encoding="utf-8"))
 init()
 def clear():
@@ -35,13 +36,18 @@ vouch_count = load_vouch_count()
 embed_color = int(config['hex_embed_color'], 16)
 server = config["support_server"]
 footertext = config["footer_text"]
+admin_role = int(config["admin_role"])
+emoji_id = int(config['emoji_id'])
 activity = discord.Activity(type=discord.ActivityType.playing, name=config['status'])
 bot = discord.Bot(command_prefix="/", activity=activity, status=discord.Status.online, intents=discord.Intents.all())
 
+@bot.event
+async def on_ready():
+    print("ready")
 @bot.slash_command(name='vouch', stars=int, description='Give a vouch to someone!', guild_ids=[int(config['guild_id'])])
 async def vouch(ctx, message: str, stars = discord.Option(str, "select how many stars", choices=['⭐⭐⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐', '⭐⭐', '⭐']), attachment = discord.Option(discord.Attachment, "upload image/video proof", required=False)):
     channeltosend = await bot.fetch_channel(int(config['vouch_command_channel']))
-    await ctx.defer()
+    await ctx.defer(ephemeral=True)
     global vouch_count
     
     user = ctx.user
@@ -63,8 +69,16 @@ async def vouch(ctx, message: str, stars = discord.Option(str, "select how many 
         embed.add_field(name="Image Proof:", value="", inline=False)
         embed.set_image(url=attachment.url)
     
-    await channeltosend.send(embed=embed)
-    await ctx.respond("vouch sent successfully!", ephemeral=True)
+    msgtoreact = await channeltosend.send(embed=embed)
+    try:
+        emoji = bot.get_emoji(emoji_id)
+        if emoji:
+            await msgtoreact.add_reaction(emoji)
+        else:
+            print(f"Emoji with ID {emoji_id} not found.")
+    except Exception as e:
+        print(f"Failed to add reaction: {e}")
+    await ctx.respond("Vouch sent successfully! ✅", ephemeral=True)
 
     vouch_info = {
         'vouch': message,
@@ -84,22 +98,32 @@ async def vouch(ctx, message: str, stars = discord.Option(str, "select how many 
     vouch_count += 1
     save_vouch_count(vouch_count)
 
+@bot.slash_command(name='restorevouches', description='Restore all vouches', guild_ids=[int(config['guild_id'])])
+async def restorevouches(ctx):
+    await ctx.defer(ephemeral=True)
 
-@bot.slash_command(name='backupvouches', description='Backup all vouches!', guild_ids=[int(config['guild_id'])])
-async def backupvouches(ctx):
-    await ctx.defer()
-    channeltosend = await bot.fetch_channel(int(config['backup_command_channel']))    
+    admin_role_id = int(admin_role)
+    user_roles = [role.id for role in ctx.author.roles]
+    
+    if admin_role_id not in user_roles:
+        await ctx.respond("You do not have permission to use this command!", ephemeral=True)
+        return
+
+    channeltosend = await vouchbot.fetch_channel(int(config['vouch_command_channel']))
+
     if not os.listdir('vouches'):
-        await ctx.respond("No vouches to backup!", ephemeral=True)
+        await ctx.respond("No vouches to restore!", ephemeral=True)
         return
     
-    for filename in os.listdir('vouches'):
+    files = sorted(os.listdir('vouches'), key=lambda x: int(x.split('.')[0]))
+
+    for file_name in files:
         try:
-            with open(f'vouches/{filename}', 'r') as f:
+            with open(f'vouches/{file_name}', 'r') as f:
                 vouch = json.load(f)
                 stars_display = '⭐' * vouch['stars']
 
-                embed = discord.Embed(title="Backed Up Vouch!", color=embed_color, url=server)
+                embed = discord.Embed(title="Restored Vouch!", color=embed_color, url=server)
                 embed.add_field(name="Vouch:", value=vouch['vouch'], inline=False)
                 embed.add_field(name="Stars:", value=stars_display, inline=False)
                 embed.add_field(name="Nº:", value=vouch['vouch_number'], inline=True)
@@ -107,20 +131,31 @@ async def backupvouches(ctx):
                 embed.add_field(name="Vouched by:", value=f"{vouch['vouched_by_id']}", inline=True)
                 embed.set_thumbnail(url=vouch['vouched_by_avatar_url'])
                 embed.set_footer(text=footertext)
-                
+
                 if 'time_stamp' in vouch:
-                    time_stamp = datetime.fromisoformat(vouch['time_stamp'])  
+                    time_stamp = datetime.fromisoformat(vouch['time_stamp'])
                     embed.timestamp = time_stamp
-                
-                if vouch['attachment']:
+
+                if vouch.get('attachment'):
                     embed.set_image(url=vouch['attachment'])
-                
-                await channeltosend.send(embed=embed)
-                await ctx.respond("backed up vouches successfully", ephemeral=True)
-                print(f"Backed up vouch! number: {filename}")
+
+                msgtoreact = await channeltosend.send(embed=embed)
+                try:
+                    emoji = bot.get_emoji(emoji_id)
+                    if emoji:
+                        await msgtoreact.add_reaction(emoji)
+                    else:
+                        print(f"Emoji with ID {emoji_id} not found.")
+                except Exception as e:
+                    print(f"Failed to add reaction: {e}")
+
+                print(f"Restored vouch! number: {file_name}")
         except json.JSONDecodeError:
-            print(f"Skipping invalid JSON file: {filename}")
+            print(f"Skipping invalid JSON file: {file_name}")
             continue
+
+    await ctx.respond("Restored all vouches successfully! ✅", ephemeral=True)
+
 
 clear()
 title()
