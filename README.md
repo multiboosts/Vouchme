@@ -9,7 +9,7 @@
 
 # Commands:
 *   /vouch (vouch message) (stars rated) (optional image proof)
-*   /backupvouches
+*   /restorevouches
 
 
 <h2>Installation</h2>
