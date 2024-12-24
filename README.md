@@ -1,4 +1,4 @@
-<h1 align="center" id="title">multiboosts</h1>
+<h1 align="center" id="title">Fusion Boosts</h1>
 
 <p id="description">Discord Bot Made For Servers Who Use User Vouches For Proofs This Is A Basic Project Made In Python And You Can Restore The Vouches If The Channel Gets Deleted Or Server Gets Termed.</p>
 
@@ -24,5 +24,5 @@
 
 <p>5. run start.bat</p>
 
-# support us
-if you want to support us make sure to join our discord server https://discord.gg/multiboosts
+# support/help
+if you want help make sure to join our discord server and create a ticket https://discord.gg/fusionboosts
