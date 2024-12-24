@@ -17,7 +17,7 @@ def clear():
 
 def title():
     if os.name == "nt":
-        ctypes.windll.kernel32.SetConsoleTitleW(f"Vouchme | .gg/multiboosts")
+        ctypes.windll.kernel32.SetConsoleTitleW(f"Vouchme | .gg/fusionboosts")
     else:
         pass
 
