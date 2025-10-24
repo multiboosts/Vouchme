@@ -1,4 +1,4 @@
-<h1 align="center" id="title">OUTDATED JOIN PERCBOOSTS TO BUY THE NEW VERSION</h1>
+<h1 align="center" id="title">OUTDATED | SHOULD I UPDATE THIS?</h1>
 
 <p id="description">Discord Bot Made For Servers Who Use User Vouches For Proofs This Is A Basic Project Made In Python And You Can Restore The Vouches If The Channel Gets Deleted Or Server Gets Termed.</p>
 
